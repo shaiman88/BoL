@@ -1,8 +1,3 @@
---[[ Chancey's Script Updater
---UPDATEURL=
---HASH=D7063D56F651F18DCD5A079102CC5F1A
---UPDATE=False
-Don't remove any of these lines or script may become corrupted]]
 if myHero.charName ~= "Leona" then return end
 
 require 'VPrediction'
