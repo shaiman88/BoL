@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.1"
+local version = "2.2"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -227,11 +227,13 @@ function OnDraw()
 		if JBConfig.drawsettings.tstarget and ts.target ~= nil then
 			DrawCircle2(ts.target.x, ts.target.y, ts.target.z, 70, ARGB(255, 255, 0, 0))
 		end
+		--[[
 		if ts.target ~= nil then
 			local textToDraw 
 			if (VP.TargetsImmobile[ts.target.networkID] and VP.TargetsImmobile[ts.target.networkID] >= os.clock()) then textToDraw = "Immobile" else textToDraw = "Not Immobile" end
 			DrawText(textToDraw, 50, 100, 100, ARGB(100,30,184,22))
 		end
+		]]
 	end
 end
 
