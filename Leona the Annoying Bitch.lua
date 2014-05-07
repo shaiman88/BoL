@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.2"
+local version = "2.3"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -175,7 +175,7 @@ function OnProcessSpell(unit, spell)
 		if wready then CastSpell(_W) end
 	end
 
-	if unit.isMe and string.find(string.lower(spell.name), "attack") then
+	if unit.isMe and string.find(string.lower(spell.name), "attack") and ts.target ~= nil then
 		if qready and JBConfig.misc.q == 4 and not (VP.TargetsImmobile[ts.target.networkID] and VP.TargetsImmobile[ts.target.networkID] > os.clock() + .237) then CastSpell(_Q) end
 	end
 end
