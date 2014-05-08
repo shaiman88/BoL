@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 --require 'Prodiction'
 
-local version = "1.2"
+local version = "1.3"
 local qready, wready, eready, rready
 local dfgslot, bftslot, fqcslot = nil, nil, nil
 local dfgready, bftready, fqcready = false, false , false
@@ -19,6 +19,8 @@ local eSeqCount = 0
 local eqLine, eqCircle
 local rPos
 local passiveMode = false
+
+--draw seed timers
 
 
 function OnLoad()
@@ -66,7 +68,7 @@ function OnLoad()
 	--ProdQ = Prod:AddProdictionObject(_Q, 800, 1400, .25, 440)
 	zSOW = SOW(VP)
 	zSOW:LoadToMenu(ZConfig.orbwalker)
-	zSOW:EnableAttacks()
+	if zSOW.Enabled then zSOW:EnableAttacks() end
 	DelayAction(function() print("<font color='#1FCF00'>Zyra</font> <font color='#FFFFFF'>loaded.</font>") end, 1)
 end
 
@@ -149,7 +151,7 @@ end
 
 function OnTick()
 	ts:update()
-	zSOW:EnableAttacks()
+	if zSOW.Enabled then zSOW:EnableAttacks() end
 	if ts.target ~= nil then zSOW:ForceTarget(ts.target) end
 	qready = (myHero:CanUseSpell(_Q) == READY)
 	wready = (myHero:CanUseSpell(_W) == READY)
@@ -174,12 +176,12 @@ function OnTick()
 	if myHero.health == 0 and not myHero.dead then passiveMode = true else passiveMode = false end
 
 	if passiveMode then
-		zSOW:DisableAttacks()
+		if zSOW.Enabled then zSOW:DisableAttacks() end
 		ts.mode = TARGET_LOW_HP_PRIORITY
 		ts.range = 1473
 		ts:update()
 	else
-		zSOW:EnableAttacks()
+		if zSOW.Enabled then zSOW:EnableAttacks() end
 		ts.mode = TARGET_LESS_CAST_PRIORITY
 		ts.range = 1150
 		ts:update()
@@ -187,7 +189,7 @@ function OnTick()
 
 	if eAnimation ~= nil and ePos ~= nil and ts.target ~= nil then
 		if os.clock() < eAnimation and wready then -- +.3
-			zSOW:DisableAttacks()
+			if zSOW.Enabled then  zSOW:DisableAttacks() end
 			local directionVector = (Vector(ePos)-Vector(myHero.visionPos)):normalized()
 			local castVector
 			if GetDistanceSqr(sPos, ts.target.visionPos) > 722500 then
@@ -198,7 +200,7 @@ function OnTick()
 			
 			CastSpell(_W, castVector.x, castVector.z)
 			if fqcready then CastSpell(fqcslot, ts.target) end
-			zSOW:EnableAttacks()
+			if zSOW.Enabled then zSOW:EnableAttacks() end
 		elseif os.clock() > eAnimation then
 			ePos = {}
 			sPos = {}
