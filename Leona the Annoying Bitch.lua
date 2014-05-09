@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.3"
+local version = "2.4"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -109,7 +109,7 @@ end
 
 --http://botoflegends.com/forum/topic/19669-for-devs-isfacing/
 function isFacing(source, target, lineLength)
-	if source.visionPos ~= nil then
+	if source ~= nil and source.visionPos ~= nil and target ~= nil then
 		local sourceVector = Vector(source.visionPos.x, source.visionPos.z)
 		local sourcePos = Vector(source.x, source.z)
 		sourceVector = (sourceVector-sourcePos):normalized()
@@ -140,7 +140,7 @@ function Combo()
 			CastSpell(_W)
 		end
 		if eready and not (not isFacing(ts.target, myHero, 400) and GetDistanceSqr(myHero.visionPos, ts.target.visionPos) >= 608400 and ts.target.canMove and not VP:isSlowed(ts.target, .25, 1150, myHero)) then
-			CastPosition, HitChance, Position = VP:GetLineCastPosition(ts.target, .25, 80, 875, 1225, myHero, true)
+			CastPosition, HitChance, Position = VP:GetLineCastPosition(ts.target, .25, 80, 875, 1225, myHero, false)
 			if CastPosition ~= nil and HitChance >= JBConfig.misc.hitchance then 
 				if ascready then CastSpell(ascslot) end
 				if lckready then CastSpell(lckslot) end
@@ -171,12 +171,12 @@ local notAA = {
 
 function OnProcessSpell(unit, spell)
 	--if unit.isMe then print("Unit: "..unit.charName.. " , Spell: "..spell.name.." , Delay: "..spell.windUpTime.." , Animation Time: "..spell.animationTime) end
-	if unit.team ~= myHero.team and (not notAA[string.lower(spell.name)]) and spell.target == myHero and eready and not string.find(string.lower(unit.charName), "minion") then
+	if unit.team ~= myHero.team and unit.type == myHero.type and (not notAA[string.lower(spell.name)]) and spell.target == myHero and eready and not string.find(string.lower(unit.charName), "minion") then
 		if wready then CastSpell(_W) end
 	end
 
 	if unit.isMe and string.find(string.lower(spell.name), "attack") and ts.target ~= nil then
-		if qready and JBConfig.misc.q == 4 and not (VP.TargetsImmobile[ts.target.networkID] and VP.TargetsImmobile[ts.target.networkID] > os.clock() + .237) then CastSpell(_Q) end
+		if qready and JBConfig.misc.q == 4 and spell.target.type == myHero.type and not (VP.TargetsImmobile[ts.target.networkID] and VP.TargetsImmobile[ts.target.networkID] > os.clock() + .237) then CastSpell(_Q) end
 	end
 end
 
