@@ -139,7 +139,7 @@ function Combo()
 		if ValidTarget(ts.target, 450) and wready and (targetRooted or not ts.target.canMove) then
 			CastSpell(_W)
 		end
-		if eready and not (not isFacing(ts.target, myHero, 400) and GetDistanceSqr(myHero.visionPos, ts.target.visionPos) >= 608400 and ts.target.canMove and not VP:isSlowed(ts.target, .25, 1150, myHero)) then
+		if eready and not (not isFacing(ts.target, myHero, 400) and GetDistanceSqr(myHero.visionPos, ts.target.visionPos) >= 608400) then
 			CastPosition, HitChance, Position = VP:GetLineCastPosition(ts.target, .25, 80, 875, 1225, myHero, false)
 			if CastPosition ~= nil and HitChance >= JBConfig.misc.hitchance then 
 				if ascready then CastSpell(ascslot) end
@@ -147,7 +147,7 @@ function Combo()
 				CastSpell(_E, CastPosition.x, CastPosition.z) 
 			end
 		end
-		if rready and ValidTarget(ts.target, 1125) and targetRooted and JBConfig.combosettings.useUlt then
+		if rready and ValidTarget(ts.target, 1125) and (VP.TargetsImmobile[ts.target.networkID] and VP.TargetsImmobile[ts.target.networkID] > os.clock() + .75) and JBConfig.combosettings.useUlt then
 			CastSpell(_R, ts.target.visionPos.x, ts.target.visionPos.z)
 		end
 	end
@@ -184,7 +184,7 @@ end
 function CastR(target)
 	if target ~= nil and eready and rready then
 		spellPos, HitChance, nTargets = VP:GetCircularAOECastPosition(target, .25, 300, 1200, 20)
-		if spellPos ~= nil and HitChance >= 2 then
+		if spellPos ~= nil and HitChance >= 2 and JBConfig.combosettings.useUlt then
 	        CastSpell(_R, spellPos.x, spellPos.z)
 	    end
 	end
