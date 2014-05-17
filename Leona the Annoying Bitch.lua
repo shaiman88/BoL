@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.4"
+local version = "2.5"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -139,7 +139,7 @@ function Combo()
 		if ValidTarget(ts.target, 450) and wready and (targetRooted or not ts.target.canMove) then
 			CastSpell(_W)
 		end
-		if eready and not (not isFacing(ts.target, myHero, 400) and GetDistanceSqr(myHero.visionPos, ts.target.visionPos) >= 608400) then
+		if myHero.visionPos ~= nil and ts.target.visionPos ~= nil and eready and not (not isFacing(ts.target, myHero, 400) and GetDistanceSqr(myHero.visionPos, ts.target.visionPos) >= 608400) then
 			CastPosition, HitChance, Position = VP:GetLineCastPosition(ts.target, .25, 80, 875, 1225, myHero, false)
 			if CastPosition ~= nil and HitChance >= JBConfig.misc.hitchance then 
 				if ascready then CastSpell(ascslot) end
