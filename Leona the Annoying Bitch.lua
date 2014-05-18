@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.6"
+local version = "2.5"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -109,12 +109,12 @@ end
 
 --http://botoflegends.com/forum/topic/19669-for-devs-isfacing/
 function isFacing(source, target, lineLength)
-	if source ~= nil and source.visionPos ~= nil and target ~= nil then
+	if not source.dead and source.visionPos ~= nil and not target.dead and target.visionPos ~= nil then
 		local sourceVector = Vector(source.visionPos.x, source.visionPos.z)
 		local sourcePos = Vector(source.x, source.z)
 		sourceVector = (sourceVector-sourcePos):normalized()
 		sourceVector = sourcePos + (sourceVector*(GetDistance(target, source)))
-		return (sourceVector ~= nil and target ~= nil and (GetDistanceSqr(target, {x = sourceVector.x, z = sourceVector.y}) <= (lineLength and lineLength^2 or 90000))) or false
+		return GetDistanceSqr(target, {x = sourceVector.x, z = sourceVector.y}) <= (lineLength and lineLength^2 or 90000)
 	end
 end
 
