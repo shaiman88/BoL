@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.5"
+local version = "2.6"
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -114,7 +114,7 @@ function isFacing(source, target, lineLength)
 		local sourcePos = Vector(source.x, source.z)
 		sourceVector = (sourceVector-sourcePos):normalized()
 		sourceVector = sourcePos + (sourceVector*(GetDistance(target, source)))
-		return GetDistanceSqr(target, {x = sourceVector.x, z = sourceVector.y}) <= (lineLength and lineLength^2 or 90000)
+		return (sourceVector ~= nil and target ~= nil and (GetDistanceSqr(target, {x = sourceVector.x, z = sourceVector.y}) <= (lineLength and lineLength^2 or 90000))) or false
 	end
 end
 
