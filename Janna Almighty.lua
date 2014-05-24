@@ -1,13 +1,8 @@
---[[ Chancey's Script Updater
---UPDATEURL=
---HASH=54D5D2BC8913BB9BF38973CB5D55EBCA
---UPDATE=False
-Don't remove any of these lines or script may become corrupted]]
 if myHero.charName ~= "Janna" then return end
 
 require 'VPrediction'
 
-local version = "1.5"
+local version = "1.6"
 local qready, wready, eready, rready
 local qready2 = false
 local VP = nil
@@ -97,7 +92,7 @@ function OnTick()
 	if isUlting and _G.AutoCarry and _G.AutoCarry.MyHero then
 		_G.AutoCarry.MyHero:AttacksEnabled(false)
 		_G.AutoCarry.MyHero:MovementEnabled(false)
-	else 
+	elseif _G.AutoCarry and _G.AutoCarry.MyHero then
 		_G.AutoCarry.MyHero:AttacksEnabled(true) 
 		_G.AutoCarry.MyHero:MovementEnabled(true)
 	end
