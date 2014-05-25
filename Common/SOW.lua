@@ -1,28 +1,5 @@
-local version = "1.129"
-local AUTOUPDATE = false
-local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/honda7/BoL/master/Common/SOW.lua".."?rand="..math.random(1,10000)
-local UPDATE_FILE_PATH = LIB_PATH.."SOW.lua"
-local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
-
-function _AutoupdaterMsg(msg) print("<font color=\"#6699ff\"><b>SOW:</b></font> <font color=\"#FFFFFF\">"..msg..".</font>") end
-if AUTOUPDATE then
-	local ServerData = GetWebResult(UPDATE_HOST, "/honda7/BoL/master/VersionFiles/SOW.version")
-	if ServerData then
-		ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
-		if ServerVersion then
-			if tonumber(version) < ServerVersion then
-				_AutoupdaterMsg("New version available"..ServerVersion)
-				_AutoupdaterMsg("Updating, please don't press F9")
-				DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () _AutoupdaterMsg("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
-			else
-				_AutoupdaterMsg("You have got the latest version ("..ServerVersion..")")
-			end
-		end
-	else
-		_AutoupdaterMsg("Error downloading version info")
-	end
-end
+local version = "1.127"
+local AUTOUPDATE = true
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -126,7 +103,6 @@ function SOW:LoadToMenu(m, STS)
 	self.Menu.ExtraWindUpTime = GetSave("SOW").ExtraWindUpTime
 
 	self.Menu:addParam("Attack",  "Attack", SCRIPT_PARAM_LIST, 2, { "Only Farming", "Farming + Carry mode"})
-	self.Menu:addParam("Mode",  "Orbwalking mode", SCRIPT_PARAM_LIST, 1, { "To mouse", "To target"})
 
 	self.Menu:addParam("Hotkeys", "", SCRIPT_PARAM_INFO, "")
 
@@ -179,7 +155,7 @@ function SOW:MyRange(target)
 	if target and ValidTarget(target) then
 		myRange = myRange + self.VP:GetHitBox(target)
 	end
-	return myRange - 20
+	return myRange - 4
 end
 
 function SOW:InRange(target)
@@ -270,14 +246,8 @@ function SOW:OrbWalk(target, point)
 		self:Attack(target)
 	elseif self:CanMove() and self.Move then
 		if not point then
-			local OBTarget = GetTarget()
-			if self.Menu.Mode == 1 or not OBTarget then
-				local Mv = Vector(myHero) + 400 * (Vector(mousePos) - Vector(myHero)):normalized()
-				self:MoveTo(Mv.x, Mv.z)
-			elseif GetDistanceSqr(OBTarget) > 50*50 then
-				local point = self.VP:GetPredictedPos(OBTarget, 0, 2*myHero.ms, myHero, false)
-				self:MoveTo(point.x, point.z)
-			end
+			local Mv = Vector(myHero) + 400 * (Vector(mousePos) - Vector(myHero)):normalized()
+			self:MoveTo(Mv.x, Mv.z)
 		else
 			self:MoveTo(point.x, point.z)
 		end
@@ -339,7 +309,7 @@ end
 function SOW:resetAA()
 	self.LastAttack = 0
 end
---TODO: Change this.
+
 function SOW:BonusDamage(minion)
 	local AD = myHero:CalcDamage(minion, myHero.totalDamage)
 	local BONUS = 0
@@ -434,20 +404,6 @@ function SOW:BonusDamage(minion)
 				RecvPacketNasusAdded = true
 				AddRecvPacketCallback(NasusOnRecvPacket)
 			end
-		end
-	elseif myHero.charName == "Ziggs" then
-		if not CallbackZiggsAdded then
-			function ZiggsParticle(obj)
-				if GetDistance(obj) < 100 and obj.name:lower():find("ziggspassive") then
-						ZiggsParticleObj = obj
-				end
-			end
-			AddCreateObjCallback(ZiggsParticle)
-			CallbackZiggsAdded = true
-		end
-		if ZiggsParticleObj and ZiggsParticleObj.valid then
-			local base = {20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 88, 100, 112, 124, 136, 148, 160}
-			BONUS = BONUS + myHero:CalcMagicDamage(minion, base[myHero.level] + (0.25 + 0.05 * (myHero.level % 7)) * myHero.ap)  
 		end
 	end
 
