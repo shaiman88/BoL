@@ -1,12 +1,13 @@
 if myHero.charName ~= "Janna" then return end
 
-require 'VPrediction'
 
-local version = "1.6"
+require 'VPrediction'
+require "SourceLib"
+
+local version = "2.0"
 local qready, wready, eready, rready
 local qready2 = false
 local VP = nil
-local blockAA = false
 local ADC, lowGuy
 local sq = false
 local exhaust, exhaustready
@@ -14,6 +15,7 @@ local checkVersion = true
 local VPVersion
 local isUlting = false
 local ultTime -- check just in case
+local MMAloaded, SACloaded
 
 function OnLoad()
 	JAConfig = scriptConfig("Janna Almighty - "..version.."", "jannaconfig")
@@ -22,6 +24,7 @@ function OnLoad()
 	JAConfig:addSubMenu("Draw Settings", "drawsettings")
 
 	JAConfig.drawsettings:addParam("enabledraw", "Draw Circle Ranges", SCRIPT_PARAM_ONOFF, true)
+	JAConfig.drawsettings:addParam("lagfree", "Lag free", SCRIPT_PARAM_ONOFF, true)
 	JAConfig.drawsettings:addParam("q", "Draw Q", SCRIPT_PARAM_ONOFF, true)
 	JAConfig.drawsettings:addParam("w", "Draw W", SCRIPT_PARAM_ONOFF, true)
 	JAConfig.drawsettings:addParam("e", "Draw E", SCRIPT_PARAM_ONOFF, true)
@@ -30,7 +33,6 @@ function OnLoad()
 	JAConfig.combosettings:addParam("movetomouse", "Move to mouse", SCRIPT_PARAM_ONOFF, true)
 	JAConfig.combosettings:permaShow("comboActive")
 
-	JAConfig:addParam("sac", "Using SAC/MMA", SCRIPT_PARAM_ONOFF, true)
 	JAConfig:addParam("autoshield", "Auto Shield", SCRIPT_PARAM_ONOFF, true)
 	JAConfig:addParam("autoq", "Auto Q Ults & Other shit", SCRIPT_PARAM_ONOFF, true)
 
@@ -44,9 +46,18 @@ function OnLoad()
 	if myHero:GetSpellData(SUMMONER_1).name:find("SummonerExhaust") then exhaust = SUMMONER_1
 	elseif myHero:GetSpellData(SUMMONER_2).name:find("SummonerExhaust") then exhaust = SUMMONER_2 end
 
+	PacketHandler:HookOutgoingPacket(Packet.headers.S_MOVE, CancelMovement)
+
 	print("<font color='#EDD84C'>Janna</font><font color='#FFFFFF'> Almighty loaded!</font>")
 end
 
+function CancelMovement(p)
+	if isUlting and JAConfig.combosettings.comboActive then
+		print("here")
+		local packet = Packet(p)
+		p:Block()
+	end
+end
 
 function OnTick()
 	ts:update()
@@ -56,22 +67,11 @@ function OnTick()
 	rready = (myHero:CanUseSpell(_R) == READY)
 	exhaustready = (exhaust ~= nil and myHero:CanUseSpell(exhaust) == READY)
 
+	MMAloaded = _G.MMA_Loaded
+	SACloaded = _G.AutoCarry and _G.AutoCarry.MyHero
+	_G.hasOrbwalker = (SACloaded or MMAloaded)
 
-	if checkVersion then
-		if VP.version ~= nil then
-			VPVersion = VP.version
-			VPVersion = string.gsub(VPVersion, "Version: ", "")
-			VPVersion = tonumber(VPVersion)
-			if VPVersion < 2.401 then
-				print("<font color='#EDD84C'>Janna Almighty: You need to update VPrediction to the latest version!</font><")
-				print("<font color='#EDD84C'>Janna Almighty: You need to update VPrediction to the latest version!</font><")
-				print("<font color='#EDD84C'>Janna Almighty: You need to update VPrediction to the latest version!</font><")
-			end
-			checkVersion = false
-		end
-	end
-
-	if not qready and not wready then blockAA = false else blockAA = true end
+	if (IsKeyDown(GetKey("R")) or IsKeyDown(GetKey("r"))) and rready then isUlting = true end
 
 
 	if sq and (myHero:CanUseSpell(_Q) == READY) and not isUlting then
@@ -88,21 +88,12 @@ function OnTick()
 			isUlting = false
 		end
 	end
-
-	if isUlting and _G.AutoCarry and _G.AutoCarry.MyHero then
-		_G.AutoCarry.MyHero:AttacksEnabled(false)
-		_G.AutoCarry.MyHero:MovementEnabled(false)
-	elseif _G.AutoCarry and _G.AutoCarry.MyHero then
-		_G.AutoCarry.MyHero:AttacksEnabled(true) 
-		_G.AutoCarry.MyHero:MovementEnabled(true)
-	end
-
 	Combo()
 	AutoShield()
 end
 
 function Combo()
-	if not JAConfig.sac and JAConfig.combosettings.movetomouse and not isUlting and JAConfig.combosettings.comboActive then
+	if not hasOrbwalker and JAConfig.combosettings.movetomouse and not isUlting and JAConfig.combosettings.comboActive then
 		myHero:MoveTo(mousePos.x, mousePos.z)
 	end
 	if ts.target ~= nil and JAConfig.combosettings.comboActive and ValidTarget(ts.target) and not isUlting then
@@ -166,20 +157,43 @@ function CastSpellP(spell, target)
 	end
 end
 
-function OnDraw()
-	if JAConfig.drawsettings.enabledraw then
-		if JAConfig.drawsettings.q then
-			DrawCircle(myHero.x, myHero.y, myHero.z, 1100, ARGB(255,36,0,255))
-		end
-		if JAConfig.drawsettings.w then
-			DrawCircle(myHero.x, myHero.y, myHero.z, 600, ARGB(255,36,0,255))
-		end
-		if JAConfig.drawsettings.e then
-			DrawCircle(myHero.x, myHero.y, myHero.z, 800, ARGB(255,36,0,255))
-		end
+function DrawCircleNextLvl(x, y, z, radius, width, color, chordlength)
+	radius = radius or 300
+	quality = math.max(8,math.floor(180/math.deg((math.asin((chordlength/(2*radius)))))))
+	quality = 2 * math.pi / quality
+	radius = radius*.92
+	local points = {}
+	for theta = 0, 2 * math.pi + quality, quality do
+		local c = WorldToScreen(D3DXVECTOR3(x + radius * math.cos(theta), y, z - radius * math.sin(theta)))
+		points[#points + 1] = D3DXVECTOR2(c.x, c.y)
+	end
+	DrawLines2(points, width or 1, color or 4294967295)
+end
+
+function DrawCircle2(x, y, z, radius, color)
+	local vPos1 = Vector(x, y, z)
+	local vPos2 = Vector(cameraPos.x, cameraPos.y, cameraPos.z)
+	local tPos = vPos1 - (vPos1 - vPos2):normalized() * radius
+	local sPos = WorldToScreen(D3DXVECTOR3(tPos.x, tPos.y, tPos.z))
+	if OnScreen({ x = sPos.x, y = sPos.y }, { x = sPos.x, y = sPos.y })  then
+		DrawCircleNextLvl(x, y, z, radius, 1, color, 75)	
 	end
 end
 
+function OnDraw()
+	if JAConfig.drawsettings.enabledraw then
+		local drawFunction = (JAConfig.drawsettings.lagfree and function(x, y, z, radius, color) DrawCircle2(x, y, z, radius, color) end) or (function(x, y, z, radius, color) DrawCircle(x, y, z, radius, color) end)
+		if JAConfig.drawsettings.q then
+			drawFunction(myHero.x, myHero.y, myHero.z, 1100, ARGB(255,36,0,255))
+		end
+		if JAConfig.drawsettings.w then
+			drawFunction(myHero.x, myHero.y, myHero.z, 600, ARGB(255,36,0,255))
+		end
+		if JAConfig.drawsettings.e then
+			drawFunction(myHero.x, myHero.y, myHero.z, 800, ARGB(255,36,0,255))
+		end
+	end
+end
 
 function OnProcessSpell(unit, spellProc)
 	--print("Spell: "..spellProc.name.." , "..unit.charName)
@@ -205,15 +219,10 @@ function OnProcessSpell(unit, spellProc)
 			end
 		end
 	end
-	if unit.isMe and spellProc.name == "ReapTheWhirlwind" then
+	if unit.isMe and string.lower(spellProc.name) == "reapthewhirlwind" then
 		isUlting = true
 		ultTime = os.clock()
 	end
-end
-
-function OnCreateObj(object)
-	--if not string.find(object.name, "Odin") then print(object.name) end
-
 end
 
 function OnGainBuff(unit, buff)
