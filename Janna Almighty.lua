@@ -53,7 +53,6 @@ end
 
 function CancelMovement(p)
 	if isUlting and JAConfig.combosettings.comboActive then
-		print("here")
 		local packet = Packet(p)
 		p:Block()
 	end
