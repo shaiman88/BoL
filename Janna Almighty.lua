@@ -1,7 +1,5 @@
 if myHero.charName ~= "Janna" then return end
 
-
-require 'VPrediction'
 require "SourceLib"
 
 local version = "2.0"
