@@ -698,7 +698,7 @@ function GetSpellInfo(spell)
     local spellInfo = ""
     if Config.Prints.spells.name then spellInfo = "Name: "..spell.name end
     if Config.Prints.spells.pos then spellInfo = spellInfo.." , Pos: ".. stringconv(spell.pos) end
-    if Config.Prints.spells.target then spellInfo = spellInfo.." , Target: "..spell.target.charName end
+    if Config.Prints.spells.target then spellInfo = spellInfo.." , Target: "..((spell.target ~= nil and spell.target.charName) or 'nil') end
     if Config.Prints.spells.windUpTime then spellInfo = spellInfo.." , windUpTime: "..spell.windUpTime end
     if Config.Prints.spells.animationTime then spellInfo = spellInfo.." , animationTime: "..spell.animationTime end
     if Config.Prints.spells.projectileID then spellInfo = spellInfo.." , projectileID: "..spell.projectileID end
