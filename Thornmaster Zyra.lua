@@ -1,6 +1,11 @@
-if myHero.charName ~= 'Annie' or not VIP_USER then return end
-
-_G.NoBugSplat = true --set this to false if you get a bugsplat or you freeze during "Validating Access"
+--[[
+	Version: 1.61
+	Changelog:
+		-Typo fix
+	Version: 1.6
+	-Callback bug fix
+]]
+if myHero.charName ~= 'Zyra' or not VIP_USER then return end
 
 LoadProtectedScript('VjUzEzdFTURpN0NFYN50TGhvRUxAbTNLRXlNeER2ZUVMRm1zSyB5TXlMMuXFU0DtM0lFeU19RXJlRRMHbTdARXlNPyMXHwwiKghQP0V4TXlGc2VFTENtM0tHeUV1RnJlw0wAbfULBXlL+AZyJURMQHCyS0Q9THlG86RFTIBss0uYec172/JlRdEA7TNURflNfUZyZUFLQG0zKjYKKAsycmFATEBtXyQkHU19S3JlRQ4hHlZ9cT0oGikWAEVIQ20zSycNTXlGcmVETEBtM0tFeU15RnJlRUxAbTNLRXlNeEZyZURMQG0zS0V5TXlGcmVFTEBtMw==BBB7CA489E14645628B3CA0C63333DF7')
 
