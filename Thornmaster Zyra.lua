@@ -1,9 +1,7 @@
 --[[
 	Version: 1.61
 	Changelog:
-		-Typo fix
-	Version: 1.6
-	-Callback bug fix
+		-Callback bug fix
 ]]
 if myHero.charName ~= 'Zyra' or not VIP_USER then return end
 
