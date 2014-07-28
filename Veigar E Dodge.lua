@@ -45,9 +45,4 @@ function OnTick()
 	end
 end
 
---Convert y coordinate to z
-function VectorFrom2D(p)
-	return Vector(p.x, 0, p.y)
-end
-
 --<3 Feez
