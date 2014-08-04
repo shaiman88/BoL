@@ -8,7 +8,7 @@ function OnLoad()
 	print("Veigar E Dodge loaded.")
 
 	Config = scriptConfig("Veigar E Dodge", "veigaredodge")
-	Config:addParam("dodge", "Enable dodge", SCRIPT_PARAM_ONOFF, true)
+	Config:addParam("dodge", "Enable dodge", SCRIPT_PARAM_ONKEYTOGGLE, true, GetKey("M"))
 end
 
 function OnProcessSpell(unit, spell)
