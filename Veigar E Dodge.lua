@@ -47,11 +47,7 @@ function OnTick()
 					DodgePosition = HeroVector + (HeroVector-RingVector):normalized()*60
 				end
 				if DodgePosition then
-					if VIP_USER then
-						Packet("S_MOVE", {type = 2, x = DodgePosition.x, y = DodgePosition.z}):send()
-					else
-						myHero:MoveTo(DodgePosition.x, DodgePosition.z)
-					end
+					myHero:MoveTo(DodgePosition.x, DodgePosition.z)
 				end
 			end
 		end
