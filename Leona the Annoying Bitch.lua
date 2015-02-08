@@ -4,7 +4,7 @@ require 'VPrediction'
 require 'SOW'
 
 
-local version = "2.5"
+local version = 2.6
 local qready, wready, eready, rready
 local targetUlted = false
 local targetRooted = false
@@ -13,7 +13,7 @@ local myHitBox = 0
 
 
 function OnLoad()
-	JBConfig = scriptConfig("Leona (Bitch) - "..version.."", "leonaconfig") 
+	JBConfig = scriptConfig("Leona (Bitch) - "..tostring(version).."", "leonaconfig") 
 
 	JBConfig:addSubMenu("Combo Settings", "combosettings")
 	JBConfig:addSubMenu("Auto Ult", "autoult")
@@ -238,7 +238,7 @@ function OnDraw()
 end
 
 
-function OnGainBuff(unit, buff)
+function OnApplyBuff(source, unit, buff)
 	if unit == ts.target and buff.name == "leonasolarflareslow" then
 		targetUlted = true
 	end
@@ -248,7 +248,7 @@ function OnGainBuff(unit, buff)
 	end
 end
 
-function OnLoseBuff(unit, buff)
+function OnRemoveBuff(unit, buff)
 	if unit == ts.target and buff.name == "leonasolarflareslow" then
 		targetUlted = false
 	end
